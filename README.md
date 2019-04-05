@@ -228,6 +228,132 @@ Spirit_Status Iraj <= 0 (Tampilkan Pesan “Iraj ikut tidur, dan bangun kesianga
 
 Syarat Menggunakan Lebih dari 1 Thread</p>
 
+<h3>JAWABAN</h3>
+<p>1. buat dua thread yaitu thread untuk agmal dan iraj</p>
+<p>2. di dalam fungsi agmal </p>
+<p>set status_bangun=0 dan status spirit=100</p>
+
+```
+int status_bangun = 0, status_spirit = 100;
+```
+
+<p>setiap agmal dijalankan, maka akan tersimpan nilai count, jika agmal dijalankan kurang dari tiga kali, maka
+status_bangun akan bertambah 15, jika status bangun lebih dari 100 maka print 'Agmal Terbangun,mereka bangun pagi dan berolahraga'</p>
+
+```
+ while(status_bangun < 100 && status_spirit > 0){
+
+        if(agmal_bangun && iraj_count< 3){
+            agmal_bangun = 0;
+            status_bangun += 15;
+            agmal_count++;
+            if(status_bangun >= 100){
+                printf("Agmal Terbangun,mereka bangun pagi dan berolahraga\n");
+                exit(1);
+            }
+        }
+```
+
+<p>jika iraj_count sudah dijalankan lebih dari tiga kali maka agmal_bangun tidak bisa dijalankan selama 10 detik</p>
+
+```
+    if(iraj_count >= 3){
+
+        printf("Agmal Ayo Bangun disabled 10 s\n");
+        for(int i=0; i<10; i++){
+
+        if(iraj_count >= 6){
+            iraj_count = 3;
+                i = 0;
+            printf("Agmal Ayo Bangun disabled 10 s\n");
+                }
+
+          if(agmal_bangun){
+              agmal_bangun = 0;
+                  printf("Agmal Ayo Bangun disabled 10 s\n");
+                }
+
+             sleep(1);
+            }
+```
+
+<p>jika iraj_count dan agmal_bangun sama dengan 0, maka fitur agmal akan aktif kembali.</p>
+
+```
+        iraj_count = 0;
+        agmal_bangun = 0;
+               printf("Fitur agmal aktif kembali\n");
+```
+
+<p>3. di dalam fungsi iraj</p>
+<p>set status bangun =0 dan status spirit=100.</p>
+<p>setiap iraj_tidur dijalankan, maka count iraj_tidur akan bertambah. dan nilai status spirit akan berkurang 20</p>
+
+```
+    while(status_bangun < 100 && status_spirit > 0){
+
+        if(iraj_tidur && agmal_count < 3){
+            iraj_tidur = 0;
+            status_spirit -= 20;
+            iraj_count++;
+            if(status_spirit <= 0){
+                printf("Iraj ikut tidur, dan bangun kesiangan bersama Agmal\n");
+                exit(1);
+            }
+        }
+```
+
+<p>jika agmal count sudah dijalankan 3 kali maka iraj_tidur tidak bisa dijalankan selama 10 detik.
+setelah sleep selesai maka Fitur Iraj aktif kembali.</p>
+
+```
+if(agmal_count >= 3){
+
+            printf("Fitur Iraj Ayo Tidur disabled 10 s\n");
+            for(int i=0; i<10; i++){
+
+                if(agmal_count >= 6){
+                    agmal_count = 3;
+                    i=0;
+                    printf("Fitur Iraj Ayo Tidur disabled 10 s\n");
+                }
+
+                if(iraj_tidur){
+                    iraj_tidur = 0;
+                    printf("Fitur Iraj Ayo Tidur disabled 10 s\n");
+                }
+                sleep(1);
+            }
+
+            iraj_tidur = 0;
+            agmal_count = 0;
+
+            printf("Fitur Iraj aktif kembali\n");
+```
+
+<p>4. jika terjadi game over, maka input suatu string</p>
+<p>jika string bernilai 'all', maka</p>
+
+```
+            printf("Agmal WakeUp_Status = %d\n",status_bangun);
+            printf("Iraj Spirit_Status = %d\n",status_spirit);
+```
+
+<p>jika string bernilai agmal, maka ubah nilai agmal_bangun=1</p>
+
+```
+        }else if(strcmp(input,"agmal")==0){
+            agmal_bangun = 1;
+```
+
+<p>jika string bernilai iraj, maka ubah nilai iraj_tidur=1</p>
+
+```
+        }else if(strcmp(input,"iraj")==0){
+            iraj_tidur = 1;
+        }
+```
+
 <h3>NOMER4</h3>	
 <p>Buatlah sebuah program C dimana dapat menyimpan list proses yang sedang berjalan (ps -aux) maksimal 10 list proses. Dimana awalnya list proses disimpan dalam di 2 file ekstensi .txt yaitu  SimpanProses1.txt di direktori /home/Document/FolderProses1 dan SimpanProses2.txt di direktori /home/Document/FolderProses2 , setelah itu masing2 file di  kompres zip dengan format nama file KompresProses1.zip dan KompresProses2.zip dan file SimpanProses1.txt dan SimpanProses2.txt akan otomatis terhapus, setelah itu program akan menunggu selama 15 detik lalu program akan mengekstrak kembali file KompresProses1.zip dan KompresProses2.zip 
 Dengan Syarat : 
