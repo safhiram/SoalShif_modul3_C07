@@ -556,7 +556,9 @@ int main(){
 
 <p>3. Ada 3, fungsi mode yang kita gunakan di program ini, untuk menampilkan interface saat program dijalankan dan menu menu yang dipilih oleh user</p>
 <p> a. mode_standby. Mode ini adalah yang pertama kali muncul saat menjalankan program, disini ada 5 menu(input) yang bisa kita pilih, yaitu eat, bath, battle, shop, dan exit. Dimana eat dan bath untuk menambah stats sedangkan battle dan shop untuk pindah ke mode lain </p> 
+
 ```
+
 void mode_standby(){
 	char input;
 	while (2){
@@ -623,10 +625,13 @@ void mode_standby(){
 	}
 	}
 }
+
 ``` 
+
 <p> b. shop. Mode ini digunakan untuk membeli food stock yang kita punya, disini variabel fodd_stock di share isinya dengan program lain yang bernama ./shopee melalui share memory, supaya ketika food_stock yang ada di program utama bertambah atau berkurang, maka food_stock yang ada di program ./shopee juga berkurang. </p>
 
 ```
+
 void shop(){
 	key_t key = 737;
 	int *food_stock;
@@ -662,10 +667,14 @@ void shop(){
 	shmdt(food_stock);
 	shmctl(shmid, IPC_RMID, NULL);
 }
+
 ```
+
 <p> c. battle(), mode ini dipanggil saat user ingin melakukan battle, hanya akan terjadi pengurangan health disini, yang apabila health kita habis, maka game akan berakhir </p>
 
 ``` 
+
+
 void battle(){
 	char input;
 	standb = 0;
@@ -704,7 +713,9 @@ else if (input =='2'){
 }		
 	}
 }
+
 ```
+
 <p>4. Diawal di deklarasikan variable variable yang akan kita gunakan di program ini, yaitu :</p>
 <p> a. heal, hung, hyg, adalah status dari moster yang bisa bertambah dan berkurang </p>
 <p> b. cooldown_bath, batas waktu mandi yang berjumlah 20 detik setiap kali kita mandi, dan bekrurang selama mode standby</p>
@@ -721,7 +732,8 @@ int enemy = 100, food_stock = 20, standb = 1, regen =1, mati =0;
 
 <p>5. ./shopee, adalah program lain diluar program utama yang dijalankan. Disini kita bisa menambah jumlah food_stock yang dimiliki toko makanan monster. Variabel food_stock di share dengan program utama menggunakan shared memory. Sama dengan pendeklarasian di fungsi 'shop' di program utama, menggunakan variable key dan shmid yang sama supaya bisa dihubungkan.</p>''
 
-``` 	
+``` 
+
 void main(){
 	
 	key_t key = 737;
@@ -752,4 +764,6 @@ void main(){
 	shmdt(food_stock);
 	shmctl(shmid, IPC_RMID, NULL);
 }
+
+
 ```
