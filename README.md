@@ -493,3 +493,263 @@ Restock
 Exit
 
 Pastikan terminal hanya mendisplay status detik ini sesuai scene terkait (hint: menggunakan system(“clear”))</p>
+<p> Jawaban </p>
+
+<p>1. Program ini memuat 4 fungsi utama yang nantinya akan dibuat melalui thread, agar bisa jalan di luar program yang sedang berlangsung, yaitu fungsi 'hunger', 'hygiene', 'tambah_darah', dan 'cooldown_mandi'</p>
+
+```
+void* hunger(void* arg){
+	
+	while(1){
+		if(standb ==1){
+			sleep(10);
+			hung -=5;
+		}
+	}
+}
+
+void* hygiene(void* arg){
+	while(1){
+		if (standb==1){
+			sleep(30);
+			hyg -=10;
+		}
+	}
+}
+
+void* tambah_darah(void* arg){
+	while(1){
+		if (regen ==1){
+			sleep(10);
+			heal += 5;
+			heal -= heal%300;
+		}
+	}
+}
+
+void* cooldown_mandi(void* arg){
+	while(1){
+		if (standb ==1){
+			if (cooldown_bath >0){
+				sleep(1);
+				cooldown_bath--;
+			}
+		}
+	}
+```
+<p>2. Keempat fungsi diatas dipanggil melalui thread yang kita buat di fungsi main(), dengan mendeklarasikan array threadnya terlebih dahulu, dan memasukan nama monster kita </p> 
+
+```
+int main(){
+	char monster[50];
+	pthread_t tid[5];
+	
+	system("clear");
+	printf("Monster name : ");
+	scanf("%s", monster);
+	sleep(1);
+		pthread_create(&(tid[0]), NULL, hunger, NULL);
+		pthread_create(&(tid[1]), NULL, hygiene, NULL);
+		pthread_create(&(tid[2]), NULL, tambah_darah, NULL);
+		pthread_create(&(tid[3]), NULL, cooldown_mandi, NULL);
+```
+
+<p>3. Ada 3, fungsi mode yang kita gunakan di program ini, untuk menampilkan interface saat program dijalankan dan menu menu yang dipilih oleh user</p>
+<p> a. mode_standby. Mode ini adalah yang pertama kali muncul saat menjalankan program, disini ada 5 menu(input) yang bisa kita pilih, yaitu eat, bath, battle, shop, dan exit. Dimana eat dan bath untuk menambah stats sedangkan battle dan shop untuk pindah ke mode lain </p> 
+```
+void mode_standby(){
+	char input;
+	while (2){
+		standb =1;
+		regen =1;
+		system("clear");
+	
+	if (mati ==1){
+		printf("GAME OVER\n");
+		sleep(1);
+		break;
+	}
+	
+	printf("mode standby");
+	printf("Heatlh : %d\n", heal);
+	printf("Hunger : %d\n", hung);
+	printf("Hygiene : %d\n", hyg);
+	printf("Food  left : %d\n", food);
+	if (cooldown_bath>0){
+		printf("Bath will be ready in %ds\n", cooldown_bath );
+		
+	}
+	else{
+		printf("Bath is ready\n");
+		}
+		printf("input : \n");
+		printf("1. Eat\n");
+		printf("2. Bath\n");
+		printf("3. Battle\n");
+		printf("4. Shop\n");
+		printf("5. Exit\n");
+		
+		if (hung <=0 || hyg <= 0){
+			printf("GAME OVER\n");
+			break;
+		}
+		input = getch();
+		if (input =='1'){
+			if (food >0){
+				food -=1;
+				hung += 15;
+				hung -= hung%200;
+			}
+		}
+		
+	else	if (input == '2'){
+			if (cooldown_bath== 0){
+				hyg +=30;
+				cooldown_bath =20;
+				hyg -= hyg%100;
+				
+			}
+		}
+	else if (input  == '3'){
+		system("clear");
+		battle();
+	}	
+	else if (input =='4'){
+		system("clear");
+		shop();
+			}
+	else if (input=='5'){
+		break;
+	}
+	}
+}
+``` 
+<p> b. shop. Mode ini digunakan untuk membeli food stock yang kita punya, disini variabel fodd_stock di share isinya dengan program lain yang bernama ./shopee melalui share memory, supaya ketika food_stock yang ada di program utama bertambah atau berkurang, maka food_stock yang ada di program ./shopee juga berkurang. </p>
+
+```
+void shop(){
+	key_t key = 737;
+	int *food_stock;
+	int input;
+	int shmid= shmget(key, sizeof(int), IPC_CREAT| 0777);
+	food_stock = shmat(shmid, NULL, 0);
+	
+	while (1){
+		system("clear");
+		
+		 regen = 0;
+		printf("shop mode\n");
+		printf("shop's food stock : %d\n", *food_stock);
+		printf("your   food stock : %d\n", food);
+		printf("input\n1. Buy\n2. Back\n");
+		input = getch();
+		if (input =='1'){
+			if (*food_stock >=5){
+				food += 5;
+				*food_stock -=5;
+			}
+		else{
+			system("clear");
+			printf("insufficient stock\n");
+			sleep(1);
+		}
+		}
+	else if (input =='2'){
+		system("clear");
+		break;
+	}	
+	}
+	shmdt(food_stock);
+	shmctl(shmid, IPC_RMID, NULL);
+}
+```
+<p> c. battle(), mode ini dipanggil saat user ingin melakukan battle, hanya akan terjadi pengurangan health disini, yang apabila health kita habis, maka game akan berakhir </p>
+
+``` 
+void battle(){
+	char input;
+	standb = 0;
+	regen = 0;
+	while (1){
+		if(enemy <=0){
+			printf("winn!!\n");
+			enemy =100;
+			break;
+		}
+	printf("battle mode\n");
+	printf("your health : %d\n", heal);
+	printf("enemy's health : %d\n", enemy);
+	printf("input :\n");
+	printf("1. attack\n");
+	printf("2. run\n");
+	
+	input= getch();
+	
+	if (input == '1'){
+		enemy -=20;
+		if (enemy >0){
+			heal -=20;
+			if (heal <= 0){
+				system("clear");
+				mati =1;
+				break;
+			}
+		}
+	system("clear");
+	}
+else if (input =='2'){
+	enemy =100;
+	system("clear");
+	break;
+}		
+	}
+}
+```
+<p>4. Diawal di deklarasikan variable variable yang akan kita gunakan di program ini, yaitu :</p>
+<p> a. heal, hung, hyg, adalah status dari moster yang bisa bertambah dan berkurang </p>
+<p> b. cooldown_bath, batas waktu mandi yang berjumlah 20 detik setiap kali kita mandi, dan bekrurang selama mode standby</p>
+<p> c. enemy, adalah heatlh bar enemy saat battle. Yang awalnya 100, akan berkurang selama battle berlangsung. Dan akan kembali menjadi 100 saat battle selesai</p>
+<p> d. food, jumlah makanan yang kita punya saat ini. Food_stock, jumlah makanan yang dimiliki toko, dan kita share variablenya dengan program ./shopee</p>
+<p> e. standb, untuk mengecek apakah kita sedang ada di mode standby atau tidak. <p>
+<p> f. regen, untuk mengecek apakah regen diperbolehkan  atau tidak. Regen menjadi = 0 ketika kita sedang ada dalam mode battle atau sudah mati</p>
+<p> g. mati, sebagai checking yang apabila mati==0, maka program berhenti berjalan</p>
+
+```
+int heal = 300, hung = 200, hyg = 100, food = 50, cooldown_bath = 0;
+int enemy = 100, food_stock = 20, standb = 1, regen =1, mati =0;
+```
+
+<p>5. ./shopee, adalah program lain diluar program utama yang dijalankan. Disini kita bisa menambah jumlah food_stock yang dimiliki toko makanan monster. Variabel food_stock di share dengan program utama menggunakan shared memory. Sama dengan pendeklarasian di fungsi 'shop' di program utama, menggunakan variable key dan shmid yang sama supaya bisa dihubungkan.</p>''
+
+``` 	
+void main(){
+	
+	key_t key = 737;
+	int *food_stock;
+	int input;
+	int shmid= shmget(key, sizeof(int), IPC_CREAT| 0777);
+	food_stock = shmat(shmid, NULL, 0);
+	*food_stock= 0;
+	
+	while (1){
+		system("clear");
+		printf("Shop\n");
+		printf("Stock : %d\n", *food_stock);
+		printf("Input : \n");
+		printf("1. Restock\n");
+		printf("2. Exit\n");
+		
+		input = getch();
+		
+		if (input =='1'){
+			*food_stock += 50;
+		}
+	else if (input =='2'){
+		break;
+	}
+	}
+	
+	shmdt(food_stock);
+	shmctl(shmid, IPC_RMID, NULL);
+}
+```
